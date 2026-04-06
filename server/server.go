@@ -1,0 +1,30 @@
+package server
+
+import (
+	"fmt"
+	"github.com/Rahat4089/kuroTLS/server/handlers"
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/logger"
+	"github.com/gofiber/fiber/v3/middleware/recover"
+)
+
+func StartServer(serverHost string, serverPort string) error {
+	app := fiber.New(fiber.Config{
+		AppName: "GopherTLS",
+	})
+
+	tlsGroup := app.Group("/go")
+
+	tlsGroup.Use(logger.New())
+	tlsGroup.Use(recover.New())
+
+	tlsGroup.Post("/pher", handlers.HandleTlsForwardRoute)
+
+	serverAddress := fmt.Sprintf("%s:%s", serverHost, serverPort)
+
+	if err := app.Listen(serverAddress); err != nil {
+		return err
+	}
+
+	return nil
+}
